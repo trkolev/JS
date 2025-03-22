@@ -1,33 +1,16 @@
 function solve() {
 
-  let input = document.getElementById('input').textContent
-    .split('.')
-    .map(s => s.trim())
-    .filter(s => s.length > 0);
+  let text = document.getElementById('input').value;
+  let sentences = text.split('.').filter(s => s.trim() !== '');
 
-  let outputElement = document.getElementById('output');
-  outputElement.innerHTML = '';
-  let counter = 0;
-  let rawParagraph = [];
-  while (input.length !== 0) {
+  let result = [];
 
+  for (let i = 0; i < sentences.length; i += 3){
 
-    let currentSentence = input.shift();
-
-    if (currentSentence.trim().length > 0) {
-      rawParagraph.push(currentSentence);
-      counter++;
-    }
-
-    if (counter === 3) {
-      outputElement.innerHTML += `<p>${rawParagraph.join('.')}.</p>`;
-      counter = 0;
-      rawParagraph = [];
-    }
-
+    let paragraphSentences = sentences.slice(i, i + 3).map(s => s.trim() + '·').join(' ');
+    let paragraph = `<p>${paragraphSentences}</p>`;
+    result.push(paragraph);
   }
 
-  if (rawParagraph.length > 0) {
-    outputElement.innerHTML += (`<p>${rawParagraph.join('.')}.</p>`);
-  }
+  document.getElementById('output').innerHTML = result.join('\n');
 }
