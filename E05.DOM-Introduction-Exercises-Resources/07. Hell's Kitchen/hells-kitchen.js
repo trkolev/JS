@@ -1,57 +1,64 @@
 function solve() {
-
     let text = document.querySelector('#inputs textarea').value;
-    let clearedText = text.slice(2,-2);
-
+    let clearedText = text.slice(2, -2);
     let input = clearedText.split('","');
-
-
 
     let restaurants = [];
 
     for (let restaurant of input) {
-
-        let workers = new Map;
-        let currentRestaurant = {};
         let splitedRestaurant = restaurant.split(' - ');
         let restaurantName = splitedRestaurant[0];
         let pplInput = splitedRestaurant[1].split(', ');
-        let averageCelery = 0;
-        let bestCelery = 0;
+
+        let workers = new Map();
+        let currentRestaurant = {};
+        let totalSalary = 0;
+        let bestSalary = 0;
+        let isMet = false;
+
+        for (let entry of restaurants) {
+            if (entry.name === restaurantName) {
+                workers = entry.workers;
+                currentRestaurant = entry;
+                totalSalary = entry.average * workers.size; // Restore total salary
+                bestSalary = entry.highestCelery;
+                isMet = true;
+            }
+        }
 
         for (let man of pplInput) {
-
-            let [name, celery] = man.split(' ');
-            workers.set(name, parseInt(celery));
-            averageCelery += parseInt(celery);
-            if (bestCelery < parseInt(celery)){
-                bestCelery = parseInt(celery);
+            let [name, salary] = man.split(' ');
+            salary = Number(salary);
+            workers.set(name, salary);
+            totalSalary += salary;
+            if (salary > bestSalary) {
+                bestSalary = salary;
             }
         }
 
         currentRestaurant.name = restaurantName;
         currentRestaurant.workers = workers;
-        currentRestaurant.average = averageCelery / pplInput.length;
-        currentRestaurant.highestCelery = bestCelery;
+        currentRestaurant.average = totalSalary / workers.size;
+        currentRestaurant.highestCelery = bestSalary;
 
-        restaurants.push(currentRestaurant);
-
+        if (!isMet) {
+            restaurants.push(currentRestaurant);
+        }
     }
 
-    restaurants.sort((a, b) => b.highestCelery - a.highestCelery);
+    // Fix: Sort by average salary instead of highest salary
+    restaurants.sort((a, b) => b.average - a.average);
 
-    let bestRestaurant = document.querySelector('#bestRestaurant p');
-    bestRestaurant.textContent = `Name: ${restaurants[0].name} Average Salary: ${restaurants[0].average.toFixed(2)} Best Salary: ${restaurants[0].highestCelery.toFixed(2)}`;
+    let bestRestaurant = restaurants[0];
 
-    const sortedWorkers = new Map([...restaurants[0].workers.entries()].sort((a, b) => b[1] - a[1]));
+    let bestRestaurantOutput = document.querySelector('#bestRestaurant p');
+    bestRestaurantOutput.textContent = `Name: ${bestRestaurant.name} Average Salary: ${bestRestaurant.average.toFixed(2)} Best Salary: ${bestRestaurant.highestCelery.toFixed(2)}`;
 
-    let workers = document.querySelector('#workers p');
-    
-    let output = [];
+    // Fix: Convert Map to an array before sorting
+    let sortedWorkers = [...bestRestaurant.workers.entries()].sort((a, b) => b[1] - a[1]);
 
-    sortedWorkers.forEach((salary, name) => {
-            output.push(`Name: ${name} With Salary: ${salary}`);
-    });
-
-    workers.textContent = output.join(' ');
+    let workersOutput = document.querySelector('#workers p');
+    workersOutput.textContent = sortedWorkers
+        .map(([name, salary]) => `Name: ${name} With Salary: ${salary}`)
+        .join(' ');
 }
