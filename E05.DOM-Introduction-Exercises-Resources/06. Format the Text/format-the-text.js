@@ -7,7 +7,7 @@ function solve() {
 
   for (let i = 0; i < sentences.length; i += 3){
 
-    let paragraphSentences = sentences.slice(i, i + 3).map(s => s.trim() + '·').join(' ');
+    let paragraphSentences = sentences.slice(i, i + 3).map(s => s.trim() + '.').join(' ');
     let paragraph = `<p>${paragraphSentences}</p>`;
     result.push(paragraph);
   }
